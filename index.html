@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Lorry App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f8f9fa;
+        }
+
+        .card {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            width: 350px;
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #587a58;
+        }
+
+        small {
+            color: gray;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>Welcome!</h2>
+        <p>Enter your phone number</p>
+        <input type="tel" id="phoneNumber" maxlength="10" pattern="[6-9]{1}[0-9]{9}" placeholder="Enter 10-digit number"
+            required>
+        <button onclick="sendOTP()">Send OTP</button>
+        <small>We’ll send you a one-time password</small>
+    </div>
+
+    <script>
+        document.getElementById('phoneNumber').addEventListener('input', function (e) {
+            this.value = this.value.replace(/\D/g, ''); // Only digits
+        });
+        function sendOTP() {
+            window.location.href = "otpVerificationPage.html"; // navigate to OTP page
+        }
+    </script>
+</body>
+
+</html>

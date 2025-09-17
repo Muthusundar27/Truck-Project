@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f8f9fa;
+            font-family: Arial;
+        }
+
+        .card {
+            background: #fff;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            width: 350px;
+        }
+
+        .otp-box input {
+            width: 40px;
+            height: 50px;
+            font-size: 22px;
+            text-align: center;
+            margin: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        small {
+            color: gray;
+            display: block;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="card">
+        <h2>Enter OTP</h2>
+        <p>Check your phone for the code</p>
+        <div class="otp-box">
+            <input type="text" maxlength="1"
+                oninput="this.value=this.value.replace(/[^0-9]/g,''); moveToNext(this, 'otp2')" id="otp1">
+
+            <input type="text" maxlength="1"
+                oninput="this.value=this.value.replace(/[^0-9]/g,''); moveToNext(this, 'otp3')"
+                onkeydown="moveBack(this, event, 'otp1')" id="otp2">
+
+            <input type="text" maxlength="1"
+                oninput="this.value=this.value.replace(/[^0-9]/g,''); moveToNext(this, 'otp4')"
+                onkeydown="moveBack(this, event, 'otp2')" id="otp3">
+
+            <input type="text" maxlength="1"
+                oninput="this.value=this.value.replace(/[^0-9]/g,''); moveToNext(this, 'otp5')"
+                onkeydown="moveBack(this, event, 'otp3')" id="otp4">
+
+            <input type="text" maxlength="1" oninput="this.value=this.value.replace(/[^0-9]/g,'');"
+                onkeydown="moveBack(this, event, 'otp4')" id="otp5">
+
+        </div>
+
+        <button onclick="verifyOTP()">Verify OTP</button>
+        <small>Resend OTP in 30s</small>
+    </div>
+
+    <script>
+        function moveToNext(current, nextFieldID) {
+            if (current.value.length === 1) {
+                document.getElementById(nextFieldID)?.focus();
+            }
+        }
+
+        function moveBack(current, event, previousFieldID) {
+            if (event.key === "Backspace" && current.value.length === 0) {
+                document.getElementById(previousFieldID)?.focus();
+            }
+        }
+        function verifyOTP() {
+            // alert("OTP Verified!");
+            window.location.href = "dashboardPage.html";
+        }
+    </script>
+</body>
+
+</html>

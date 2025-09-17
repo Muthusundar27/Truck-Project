@@ -1,0 +1,119 @@
+/* common.css */
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f8f9fa;
+    min-height: 100vh;
+    width: 100%;
+    padding: 0;
+}
+
+.container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+button,
+input,
+select,
+textarea {
+    font-size: 16px;
+    padding: 10px;
+    margin: 5px 0 15px 0;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 100%;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+}
+
+.btn-green {
+    background: green;
+    color: white;
+}
+
+.btn-green:hover {
+    background: #0b7d0b;
+}
+
+.btn-red {
+    background: red;
+    color: white;
+}
+
+.btn-red:hover {
+    background: #b50000;
+}
+
+.btn-blue {
+    background: #007bff;
+    color: white;
+}
+
+.btn-gray {
+    background: gray;
+    color: white;
+}
+
+.summary-box {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.summary-box div {
+    flex: 1;
+    padding: 20px;
+    border-radius: 8px;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+.trucks {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.truck-btn {
+    background: #eee;
+    padding: 15px;
+    text-align: left;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    border: none;
+}
+
+.chart {
+    border: 1px dashed #aaa;
+    height: 200px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
