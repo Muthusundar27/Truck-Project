@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Lorry</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h2>Add Truck</h2>
+        <label>Truck Name</label>
+        <input type="text" placeholder="Truck 1">
+        <label>Truck Number</label>
+        <input type="text" placeholder="TN-09-1234">
+        <label>Driver Name</label>
+        <input type="text" placeholder="Enter Driver Name">
+        <label>Driver Phone</label>
+        <input type="text" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+            placeholder="+91 98765 43210">
+        <label>Attach RC / Insurance</label>
+        <input type="file" multiple>
+
+        <div class="actions">
+            <button class="btn-green" onclick="window.location.href='dashboardPage.html'">Save</button>
+            <button class="btn-gray" onclick="window.location.href='dashboardPage.html'">Cancel</button>
+        </div>
+    </div>
+</body>
+
+</html>
