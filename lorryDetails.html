@@ -2,32 +2,134 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Lorry</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Truck</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-    <div class="container">
-        <h2>Add Truck</h2>
-        <label>Truck Name</label>
-        <input type="text" placeholder="Truck 1">
-        <label>Truck Number</label>
-        <input type="text" placeholder="TN-09-1234">
-        <label>Driver Name</label>
-        <input type="text" placeholder="Enter Driver Name">
-        <label>Driver Phone</label>
-        <input type="text" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-            placeholder="+91 98765 43210">
-        <label>Attach RC / Insurance</label>
-        <input type="file" multiple>
+  <div class="container">
+    <h2>Add Truck</h2>
 
-        <div class="actions">
-            <button class="btn-green" onclick="window.location.href='dashboardPage.html'">Save</button>
-            <button class="btn-gray" onclick="window.location.href='dashboardPage.html'">Cancel</button>
+    <form class="truck-form">
+      <!-- Vehicle No -->
+      <div class="form-section">
+        <label for="vehicleNo">Vehicle No.</label>
+        <input type="text" id="vehicleNo" placeholder="TN-09-1234" />
+      </div>
+
+      <!-- Vehicle Model -->
+      <div class="form-section">
+        <label for="vehicleModel">Vehicle Model</label>
+        <select id="vehicleModel">
+          <option value="">Select Model</option>
+          <option value="Tipper">Tipper</option>
+          <option value="Platform">Platform</option>
+          <option value="Container">Container</option>
+          <option value="Tanker">Tanker</option>
+        </select>
+      </div>
+
+      <!-- Tyre Count -->
+      <div class="form-section">
+        <label for="tyreCount">Tyre Count</label>
+        <select id="tyreCount">
+          <option value="">Select Tyre Count</option>
+          <option value="6">6</option>
+          <option value="10">10</option>
+          <option value="12">12</option>
+          <option value="14">14</option>
+        </select>
+      </div>
+
+      <!-- Diesel Quantity -->
+      <div class="form-section">
+        <label for="dieselQty">Diesel Quantity (Litres)</label>
+        <select id="dieselQty">
+          <option value="">Select Quantity</option>
+          <option value="100">100</option>
+          <option value="200">200</option>
+          <option value="300">300</option>
+          <option value="400">400</option>
+        </select>
+      </div>
+
+      <!-- Vehicle Owner -->
+      <div class="form-section">
+        <label for="vehicleOwner">Vehicle Owner</label>
+        <input type="text" id="vehicleOwner" placeholder="Owner Name" />
+      </div>
+
+      <!-- On Due -->
+      <div class="form-section">
+        <label>On Due</label>
+        <div class="radio-group">
+          <label><input type="radio" name="onDue" value="Yes" /> Yes</label>
+          <label><input type="radio" name="onDue" value="No" /> No</label>
         </div>
-    </div>
+      </div>
+
+      <!-- Due Date -->
+      <div class="form-section">
+        <label for="dueDate">Due Date</label>
+        <input type="date" id="dueDate" />
+      </div>
+
+      <!-- Loan Provider -->
+      <div class="form-section">
+        <label for="loanProvider">Loan Provider</label>
+        <input type="text" id="loanProvider" placeholder="Bank or Finance Company" />
+      </div>
+
+      <!-- EMI Amount -->
+      <div class="form-section">
+        <label for="emiAmount">EMI Amount</label>
+        <input type="text" id="emiAmount" placeholder="₹ EMI" />
+      </div>
+
+      <!-- Pollution Certificate Renewal Date -->
+      <div class="form-section">
+        <label for="pollutionDate">Pollution Certificate Renewal Date</label>
+        <input type="date" id="pollutionDate" />
+      </div>
+
+      <!-- Tax Date -->
+      <div class="form-section">
+        <label for="taxDate">Tax Date</label>
+        <input type="date" id="taxDate" />
+      </div>
+
+      <!-- Insurance Date -->
+      <div class="form-section">
+        <label for="insuranceDate">Insurance Date</label>
+        <input type="date" id="insuranceDate" />
+      </div>
+
+      <!-- FC Date -->
+      <div class="form-section">
+        <label for="fcDate">FC Date</label>
+        <input type="date" id="fcDate" />
+      </div>
+
+      <!-- Permit Date -->
+      <div class="form-section">
+        <label for="permitDate">Permit Date</label>
+        <input type="date" id="permitDate" />
+      </div>
+
+      <!-- Attachments -->
+      <div class="form-section">
+        <label>Attach RC / Insurance</label>
+        <input type="file" multiple />
+      </div>
+
+      <!-- Save Buttons -->
+      <div class="actions">
+        <button type="button" class="btn-green" onclick="window.location.href='dashboardPage.html'">Save</button>
+        <button type="button" class="btn-gray" onclick="window.location.href='dashboardPage.html'">Cancel</button>
+      </div>
+    </form>
 </body>
 
 </html>

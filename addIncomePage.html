@@ -1,45 +1,266 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Add Income</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+
+    /* Payment Status with proper alignment */
+    .radio-group {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 18px;
+      align-items: center;
+    }
+
+    .radio-group label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: normal;
+      cursor: pointer;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .radio-group input[type="radio"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    /* Payment List Dropdown */
+    #paymentList {
+      margin-bottom: 25px;
+    }
+
+    /* Attachments List */
+    .attachments-list {
+      margin-bottom: 25px;
+      max-height: 150px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 6px;
+      background: #fafafa;
+    }
+
+    .attachment-item {
+      font-size: 14px;
+      margin-bottom: 6px;
+      color: #555;
+    }
+
+    /* Buttons */
+    button {
+      cursor: pointer;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 6px;
+      margin-right: 12px;
+    }
+
+    .btn-green {
+      background: #28a745;
+      color: white;
+    }
+
+    .btn-green:hover {
+      background: #218838;
+    }
+
+    .btn-gray {
+      background: gray;
+      color: white;
+    }
+
+    .btn-gray:hover {
+      background: #5a5a5a;
+    }
+
+    .btn-blue {
+      background: #007bff;
+      color: white;
+      margin-bottom: 18px;
+    }
+
+    .btn-blue:hover {
+      background: #0056b3;
+    }
+
+    .actions {
+      margin-top: 20px;
+      display: flex;
+      justify-content: flex-start;
+    }
+  </style>
 </head>
+
 <body>
   <div class="container">
     <h2>Add Income</h2>
 
-    <label>Select Vehicle</label>
-    <select>
-      <option>🚛 Truck 1</option>
-      <option>🚛 Truck 2</option>
+    <label for="vehicleSelect">Select Vehicle</label>
+    <select id="vehicleSelect">
+      <option value="truck1">🚛 Truck 1</option>
+      <option value="truck2">🚛 Truck 2</option>
     </select>
 
-    <label>Amount</label>
-    <input type="number" placeholder="₹0.00">
+    <label for="amountInput">Amount</label>
+    <input id="amountInput" type="number" placeholder="₹0.00" min="0" />
 
-    <label>Notes (optional)</label>
-    <textarea placeholder="Enter note..."></textarea>
+    <label for="notesInput">Notes (optional)</label>
+    <textarea id="notesInput" placeholder="Enter note..."></textarea>
 
     <label>Payment Status</label>
-    <div>
-      <label><input type="radio" name="status"> Pending</label>
-      <label><input type="radio" name="status"> Complete</label>
+    <div class="radio-group" id="paymentStatusGroup">
+      <label><input type="radio" name="status" value="Pending" checked /> Pending</label>
+      <label><input type="radio" name="status" value="Complete" /> Complete</label>
     </div>
 
-    <label>Payer Mobile Number</label>
-    <input type="text" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')" placeholder="+91 98765 43210">
+    <label for="payerCompany">Payer Company Name</label>
+    <input id="payerCompany" type="text" placeholder="Company Name" />
 
-    <button class="btn-blue">Notify</button>
+    <label for="payerMobile">Payer Mobile Number</label>
+    <input id="payerMobile" type="text" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+      placeholder="+91 98765 43210" />
 
-    <label>Attach File</label>
-    <input type="file">
+    <button class="btn-blue" id="notifyBtn">Notify</button>
+
+    <label for="attachFile">Attach File</label>
+    <input id="attachFile" type="file" multiple />
+
+    <!-- List of uploaded attachments with timestamps -->
+    <div class="attachments-list" id="attachmentsList" style="display:none;">
+      <strong>Uploaded Attachments:</strong>
+      <div id="attachmentItems"></div>
+    </div>
+
+    <label for="paymentList">Payment List</label>
+    <select id="paymentList">
+      <option value="">-- Select Payment Status --</option>
+      <option value="Pending">Pending</option>
+      <option value="Complete">Complete</option>
+    </select>
 
     <div class="actions">
-      <button class="btn-green" onclick="window.location.href='dashboardPage.html'">Save</button>
-      <button class="btn-gray" onclick="window.location.href='dashboardPage.html'">Cancel</button>
+      <button type="button" class="btn-green" id="saveBtn">Save</button>
+      <button type="button" class="btn-gray" id="cancelBtn">Cancel</button>
     </div>
   </div>
+
+  <script>
+    const paymentStatusGroup = document.getElementById('paymentStatusGroup');
+    const paymentList = document.getElementById('paymentList');
+    const attachmentsList = document.getElementById('attachmentsList');
+    const attachmentItems = document.getElementById('attachmentItems');
+    const attachFileInput = document.getElementById('attachFile');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const notifyBtn = document.getElementById('notifyBtn');
+
+    let attachments = [];
+
+    // Align radio selection changes with required popups
+
+    paymentStatusGroup.addEventListener('change', (e) => {
+      const selected = e.target.value;
+      if (selected === 'Complete') {
+        const confirmed = confirm('Are you sure the amount received?');
+        if (!confirmed) {
+          // revert selection to Pending if No clicked
+          e.target.checked = false;
+          paymentStatusGroup.querySelector('input[value="Pending"]').checked = true;
+        } else {
+          // Hide attachments as payment is complete
+          attachments = [];
+          updateAttachmentUI();
+        }
+      }
+    });
+
+    // Handle attachments upload and show with timestamp
+    attachFileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      files.forEach(file => {
+        const timestamp = getTimestamp();
+        attachments.push({ name: file.name, timestamp });
+      });
+      updateAttachmentUI();
+    });
+
+    function updateAttachmentUI() {
+      if (attachments.length === 0) {
+        attachmentsList.style.display = 'none';
+        attachmentItems.innerHTML = '';
+        attachFileInput.disabled = false;
+      } else {
+        attachmentsList.style.display = 'block';
+        // Sort attachments by timestamp descending
+        attachments.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+        attachmentItems.innerHTML = attachments.map(att =>
+          `<div class="attachment-item">${att.name} (Uploaded: ${att.timestamp})</div>`
+        ).join('');
+        attachFileInput.disabled = false;
+      }
+    }
+
+    function getTimestamp() {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, '0');
+      const dd = String(d.getDate()).padStart(2, '0');
+      const hh = String(d.getHours()).padStart(2, '0');
+      const min = String(d.getMinutes()).padStart(2, '0');
+      const ss = String(d.getSeconds()).padStart(2, '0');
+      return `${yyyy}${mm}${dd}${hh}${min}${ss}`;
+    }
+
+    // Payment List dropdown logic
+    paymentList.addEventListener('change', () => {
+      if (paymentList.value === 'Pending') {
+        const days = prompt('Enter number of days to notify payer:', '3');
+        if (days !== null) {
+          alert(`Notification will be sent after ${days} days.`);
+          // Here, you would implement logic to filter pending payments and schedule notifications.
+          // For now, just a placeholder alert.
+        }
+      }
+      else if (paymentList.value === 'Complete') {
+        alert('Showing complete payments...');
+        // Add logic here later for showing complete payments
+      }
+    });
+
+    // Save button redirects to dashboard (you can replace with form submission logic)
+    saveBtn.addEventListener('click', () => {
+      alert('Form saved successfully! Redirecting to dashboard...');
+      window.location.href = 'dashboardPage.html';
+    });
+
+    // Cancel button redirects to dashboard
+    cancelBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to cancel? Unsaved data will be lost.')) {
+        window.location.href = 'dashboardPage.html';
+      }
+    });
+
+    // Notify button (stub)
+    notifyBtn.addEventListener('click', () => {
+      alert('Notification sent to payer!');
+    });
+
+    // Initialize attachments UI in case no files are attached
+    updateAttachmentUI();
+  </script>
 </body>
+
 </html>

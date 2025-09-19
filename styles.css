@@ -1,119 +1,202 @@
-/* common.css */
-
+/* Base styles */
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f8f9fa;
-    min-height: 100vh;
-    width: 100%;
-    padding: 0;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f8f9fa;
+  min-height: 100vh;
+  width: 100%;
+  padding: 0;
 }
 
 .container {
-    padding: 20px;
-    max-width: 1200px;
-    margin: auto;
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
 }
 
 h2 {
-    margin-top: 0;
-    margin-bottom: 20px;
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+  font-weight: 600;
+  font-size: 28px;
 }
 
+label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-bottom: 18px;
+  font-family: Arial, sans-serif;
+}
+
+/* Form elements */
 button,
 input,
 select,
 textarea {
-    font-size: 16px;
-    padding: 10px;
-    margin: 5px 0 15px 0;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    width: 100%;
+  font-size: 16px;
+  padding: 10px;
+  margin: 5px 0 15px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%;
 }
 
 button {
-    cursor: pointer;
-    border: none;
+  cursor: pointer;
+  border: none;
 }
 
+/* Button color styles */
 .btn-green {
-    background: green;
-    color: white;
+  background: green;
+  color: white;
 }
 
 .btn-green:hover {
-    background: #0b7d0b;
+  background: #0b7d0b;
 }
 
 .btn-red {
-    background: red;
-    color: white;
+  background: red;
+  color: white;
 }
 
 .btn-red:hover {
-    background: #b50000;
+  background: #b50000;
 }
 
 .btn-blue {
-    background: #007bff;
-    color: white;
+  background: #007bff;
+  color: white;
 }
 
 .btn-gray {
-    background: gray;
-    color: white;
+  background: gray;
+  color: white;
 }
 
+/* Summary section */
 .summary-box {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    margin-bottom: 20px;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 20px;
 }
 
-.summary-box div {
-    flex: 1;
-    padding: 20px;
-    border-radius: 8px;
-    color: white;
-    font-weight: bold;
-    text-align: center;
+.summary-card {
+  flex: 1;
+  padding: 20px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 120px;
 }
 
-.trucks {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 20px;
+.label {
+  font-size: 14px;
+  margin-bottom: 5px;
+  opacity: 0.9;
 }
 
-.truck-btn {
-    background: #eee;
-    padding: 15px;
-    text-align: left;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 16px;
-    border: none;
+.amount {
+  font-size: 18px;
 }
 
+/* Chart section for dashboard page*/
+#incomeExpenseChart {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+/* Truck section */
+/* ------------------------------ */
+/* Scoped Styles for Add Truck Page */
+/* ------------------------------ */
+
+.truck-form label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+}
+
+.truck-form input[type="text"],
+.truck-form input[type="date"],
+.truck-form select {
+  width: 100%;
+}
+
+.truck-form .radio-group {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 15px;
+  align-items: center;
+  /* Vertically center inputs and labels */
+}
+
+.truck-form .radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* space between radio button and text */
+  cursor: pointer;
+  font-weight: normal;
+  color: #333;
+}
+
+.truck-form .radio-group input[type="radio"] {
+  margin: 0;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+
+.truck-form input[type="file"] {
+  margin-top: 5px;
+}
+
+/* Add some vertical spacing between sections */
+.truck-form .form-section {
+  margin-bottom: 20px;
+}
+
+/* Chart box */
 .chart {
-    border: 1px dashed #aaa;
-    height: 200px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  border: 1px dashed #aaa;
+  height: 200px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
+/* Action buttons */
 .actions {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
 }

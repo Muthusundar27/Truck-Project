@@ -2,63 +2,15 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dashboard</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    .summary {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 20px;
-    }
-
-    .box {
-      flex: 1;
-      padding: 20px;
-      border-radius: 10px;
+    .truck-btn.active {
+      background-color: #007bff;
       color: white;
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    .income {
-      background: green;
-    }
-
-    .expense {
-      background: red;
-    }
-
-    .trucks {
-      margin-bottom: 20px;
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-
-    .truck-btn {
-      padding: 10px 15px;
-      border: none;
-      border-radius: 6px;
-      background: #eee;
-      cursor: pointer;
-    }
-
-    .chart {
-      height: 200px;
-      background: #fff;
-      border: 1px dashed gray;
-      border-radius: 6px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .actions {
-      display: flex;
-      gap: 15px;
     }
   </style>
 </head>
@@ -67,25 +19,103 @@
   <div class="container">
     <h2>Hello, Ravi!</h2>
 
+    <!-- Summary Section -->
     <div class="summary-box">
-      <div class="btn-green">Income ₹50,000</div>
-      <div class="btn-red">Expense ₹30,000</div>
+      <div class="summary-card btn-green">
+        <div class="label">Income</div>
+        <div class="amount" id="incomeAmount">₹0</div>
+      </div>
+      <div class="summary-card btn-red">
+        <div class="label">Expense</div>
+        <div class="amount" id="expenseAmount">₹0</div>
+      </div>
     </div>
 
+    <!-- Truck Selection -->
     <div class="trucks">
-      <button class="truck-btn">🚛 Truck 1</button>
-      <button class="truck-btn">🚛 Truck 2</button>
+      <button class="truck-btn" onclick="selectTruck('Truck 1')">🚛 Truck 1</button>
+      <button class="truck-btn" onclick="selectTruck('Truck 2')">🚛 Truck 2</button>
       <button class="truck-btn" onclick="window.location.href='lorryDetails.html'">➕ Add Truck</button>
     </div>
 
-    <div class="chart">Income vs Expense Chart</div>
+    <!-- Chart Section -->
+    <canvas id="incomeExpenseChart" height="100"></canvas>
 
+
+    <!-- Action Buttons -->
     <div class="actions">
       <button class="btn-green" onclick="window.location.href='addIncomePage.html'">➕ Add Income</button>
       <button class="btn-red" onclick="window.location.href='addExpensePage.html'">➕ Add Expense</button>
     </div>
   </div>
-</body>
 
+  <script>
+    const truckData = {
+      'Truck 1': { income: 50000, expense: 30000 },
+      'Truck 2': { income: 20000, expense: 15000 }
+    };
+
+    let chart; // Store Chart.js instance
+
+    function selectTruck(truckName) {
+      // Highlight selected button
+      document.querySelectorAll('.truck-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.includes(truckName)) btn.classList.add('active');
+      });
+
+      const data = truckData[truckName] || { income: 0, expense: 0 };
+
+      // Update income & expense UI
+      document.getElementById('incomeAmount').textContent = `₹${data.income.toLocaleString()}`;
+      document.getElementById('expenseAmount').textContent = `₹${data.expense.toLocaleString()}`;
+
+      // Draw or update the chart
+      updateChart(data.income, data.expense, truckName);
+    }
+
+    function updateChart(income, expense, truckName) {
+      const ctx = document.getElementById('incomeExpenseChart').getContext('2d');
+
+      if (chart) chart.destroy(); // Clear previous chart
+
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Income', 'Expense'],
+          datasets: [{
+            label: `${truckName} Overview`,
+            data: [income, expense],
+            backgroundColor: ['#28a745', '#dc3545']
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false },
+            title: {
+              display: true,
+              text: `Income vs Expense for ${truckName}`
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: value => '₹' + value.toLocaleString()
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Select first truck on load
+    window.onload = () => {
+      selectTruck('Truck 1');
+    };
+  </script>
+
+</body>
 
 </html>
