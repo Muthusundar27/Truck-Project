@@ -59,24 +59,24 @@
         <h2>Enter OTP</h2>
         <p>Check your phone for the code</p>
         <div class="otp-box">
-            <input type="text" maxlength="1"
-                oninput="this.value=this.value.replace(/\D/g, ''); moveToNext(this, 'otp2')" id="otp1">
+            <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1"
+                oninput="this.value=this.value.replace(/[^0-9]/g,''); moveToNext(this, 'otp2')" id="otp1">
 
-            <input type="text" maxlength="1"
-                oninput="this.value=this.value.replace(/\D/g, ''); moveToNext(this, 'otp3')"
+            <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1"
+                oninput="this.value=this.value.replace(/[^0-9]/g,''); moveToNext(this, 'otp3')"
                 onkeydown="moveBack(this, event, 'otp1')" id="otp2">
 
-            <input type="text" maxlength="1"
-                oninput="this.value=this.value.replace(/\D/g, ''); moveToNext(this, 'otp4')"
+            <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1"
+                oninput="this.value=this.value.replace(/[^0-9]/g,''); moveToNext(this, 'otp4')"
                 onkeydown="moveBack(this, event, 'otp2')" id="otp3">
 
-            <input type="text" maxlength="1"
-                oninput="this.value=this.value.replace(/\D/g, ''); moveToNext(this, 'otp5')"
+            <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1"
+                oninput="this.value=this.value.replace(/[^0-9]/g,''); moveToNext(this, 'otp5')"
                 onkeydown="moveBack(this, event, 'otp3')" id="otp4">
 
-            <input type="text" maxlength="1" oninput="this.value=this.value.replace(/\D/g, '');"
-                onkeydown="moveBack(this, event, 'otp4')" id="otp5">
-
+            <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1"
+                oninput="this.value=this.value.replace(/[^0-9]/g,'');" onkeydown="moveBack(this, event, 'otp4')"
+                id="otp5">
         </div>
 
         <button onclick="verifyOTP()">Verify OTP</button>
