@@ -12,12 +12,19 @@
       background-color: #007bff;
       color: white;
     }
+
+    .logout-btn:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h2>Hello, Ravi!</h2>
+    <div class="dashboard-header">
+      <div id="greeting">Hello!</div>
+      <button onclick="logout()" class="logout-btn">Logout</button>
+    </div>
 
     <!-- Summary Section -->
     <div class="summary-box">
@@ -32,15 +39,17 @@
     </div>
 
     <!-- Truck Selection -->
-    <div class="trucks">
-      <button class="truck-btn" onclick="selectTruck('Truck 1')">🚛 Truck 1</button>
-      <button class="truck-btn" onclick="selectTruck('Truck 2')">🚛 Truck 2</button>
-      <button class="truck-btn" onclick="window.location.href='lorryDetails.html'">➕ Add Truck</button>
+    <div class="trucks" id="truckSelectionContainer">
+      <!-- Buttons or dropdown will be rendered here dynamically -->
+    </div>
+
+    <!-- Add Truck Button Always Visible -->
+    <div style="margin-top: 10px;">
+      <button class="btn-green" onclick="window.location.href='lorryDetails.html'">➕ Add Truck</button>
     </div>
 
     <!-- Chart Section -->
     <canvas id="incomeExpenseChart" height="100"></canvas>
-
 
     <!-- Action Buttons -->
     <div class="actions">
@@ -50,19 +59,66 @@
   </div>
 
   <script>
+    // List of trucks and their data
     const truckData = {
       'Truck 1': { income: 50000, expense: 30000 },
-      'Truck 2': { income: 20000, expense: 15000 }
+      'Truck 2': { income: 20000, expense: 15000 },
+      // Add more trucks here if needed
+      'Truck 3': { income: 40000, expense: 25000 },
+      'Truck 4': { income: 35000, expense: 18000 },
     };
+
+    const trucks = Object.keys(truckData);
 
     let chart; // Store Chart.js instance
 
+    // Render truck selection UI based on number of trucks
+    function renderTruckSelection() {
+      const container = document.getElementById('truckSelectionContainer');
+      container.innerHTML = ''; // clear
+
+      if (trucks.length > 3) {
+        // Show dropdown
+        const select = document.createElement('select');
+        select.id = 'truckDropdown';
+        select.style.padding = '8px';
+        select.style.fontSize = '16px';
+
+        trucks.forEach(truck => {
+          const option = document.createElement('option');
+          option.value = truck;
+          option.textContent = `🚛 ${truck}`;
+          select.appendChild(option);
+        });
+
+        select.addEventListener('change', () => {
+          selectTruck(select.value);
+        });
+
+        container.appendChild(select);
+      } else {
+        // Show buttons
+        trucks.forEach(truck => {
+          const btn = document.createElement('button');
+          btn.className = 'truck-btn';
+          btn.textContent = `🚛 ${truck}`;
+          btn.onclick = () => selectTruck(truck);
+          container.appendChild(btn);
+        });
+      }
+    }
+
     function selectTruck(truckName) {
-      // Highlight selected button
-      document.querySelectorAll('.truck-btn').forEach(btn => {
+      // Highlight selected button if buttons are shown
+      const buttons = document.querySelectorAll('.truck-btn');
+      buttons.forEach(btn => {
         btn.classList.remove('active');
         if (btn.textContent.includes(truckName)) btn.classList.add('active');
       });
+
+      // If dropdown is shown, update selected value accordingly
+      const dropdown = document.getElementById('truckDropdown');
+      if (dropdown) dropdown.value = truckName;
 
       const data = truckData[truckName] || { income: 0, expense: 0 };
 
@@ -110,10 +166,32 @@
       });
     }
 
-    // Select first truck on load
     window.onload = () => {
-      selectTruck('Truck 1');
+      // Get current logged in user from localStorage
+      const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+      if (!currentUser) {
+        // If no user logged in, redirect to login page
+        window.location.href = 'index.html';
+        return;
+      }
+
+      // Update greeting text
+      document.getElementById('greeting').textContent = `Hello, ${currentUser.fullName}!`;
+
+      // Render truck selection UI
+      renderTruckSelection();
+
+      // Select first truck on load
+      if (trucks.length > 0) {
+        selectTruck(trucks[0]);
+      }
     };
+
+    function logout() {
+      localStorage.removeItem('currentUser');
+      window.location.href = 'index.html';
+    }
   </script>
 
 </body>
