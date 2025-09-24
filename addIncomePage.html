@@ -151,6 +151,11 @@
       <option value="Pending">Pending</option>
       <option value="Complete">Complete</option>
     </select>
+    <div id="transactionResults"
+      style="margin-top: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f9f9f9; display: none;">
+      <strong>Filtered Transactions:</strong>
+      <ul id="transactionList" style="margin-top: 10px; padding-left: 20px;"></ul>
+    </div>
 
     <div class="actions">
       <button type="button" class="btn-green" id="saveBtn">Save</button>
@@ -174,16 +179,34 @@
 
     paymentStatusGroup.addEventListener('change', (e) => {
       const selected = e.target.value;
+      const amount = document.getElementById('amountInput').value;
+
       if (selected === 'Complete') {
-        const confirmed = confirm('Are you sure the amount received?');
-        if (!confirmed) {
-          // revert selection to Pending if No clicked
+        if (!amount || parseFloat(amount) <= 0) {
+          showFloatingMessage('Please enter a valid amount before marking as complete.', 'error');
           e.target.checked = false;
           paymentStatusGroup.querySelector('input[value="Pending"]').checked = true;
-        } else {
-          // Hide attachments as payment is complete
+          return;
+        }
+
+        const isConfirmed = confirm(`Are you sure the amount ₹${parseFloat(amount).toFixed(2)} is received?\n\nClick "OK" for Yes or "Cancel" for No`);
+
+        if (isConfirmed) {
+          showFloatingMessage("Bill documents will be removed for this transaction. If you want it back, please contact support@example.com", "success");
+
+          // Clear attachments (simulate removal)
           attachments = [];
           updateAttachmentUI();
+
+          // Reset file input field so UI clears selected files
+          attachFileInput.value = '';
+        }
+        else {
+          showFloatingMessage("Please press Yes only if you received the payment in your bank account", "warning");
+
+          // Revert back to "Pending"
+          e.target.checked = false;
+          paymentStatusGroup.querySelector('input[value="Pending"]').checked = true;
         }
       }
     });
@@ -226,20 +249,66 @@
     }
 
     // Payment List dropdown logic
-    paymentList.addEventListener('change', () => {
-      if (paymentList.value === 'Pending') {
-        const days = prompt('Enter number of days to notify payer:', '3');
-        if (days !== null) {
-          alert(`Notification will be sent after ${days} days.`);
-          // Here, you would implement logic to filter pending payments and schedule notifications.
-          // For now, just a placeholder alert.
-        }
-      }
-      else if (paymentList.value === 'Complete') {
-        alert('Showing complete payments...');
-        // Add logic here later for showing complete payments
-      }
-    });
+    // Sample transactions data (you can replace this with real data from backend later)
+const sampleTransactions = [
+  { truckId: 'truck1', status: 'Pending', date: '2025-08-20', amount: 5000 },
+  { truckId: 'truck1', status: 'Complete', date: '2025-07-12', amount: 8000 },
+  { truckId: 'truck2', status: 'Pending', date: '2025-06-05', amount: 3000 },
+  { truckId: 'truck1', status: 'Complete', date: '2025-09-10', amount: 9000 },
+  { truckId: 'truck2', status: 'Complete', date: '2025-07-25', amount: 7500 },
+  { truckId: 'truck1', status: 'Pending', date: '2025-09-01', amount: 2000 },
+];
+
+paymentList.addEventListener('change', () => {
+  const selectedStatus = paymentList.value;
+  const selectedTruck = document.getElementById('vehicleSelect').value;
+  const resultDiv = document.getElementById('transactionResults');
+  const resultList = document.getElementById('transactionList');
+
+  resultList.innerHTML = '';
+  resultDiv.style.display = 'none';
+
+  if (!selectedStatus) {
+    showFloatingMessage("Please select a payment status to filter.", "warning");
+    return;
+  }
+
+  if (!selectedTruck) {
+    showFloatingMessage("Please select a truck to view transactions.", "error");
+    return;
+  }
+
+  const now = new Date();
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(now.getMonth() - 3);
+
+  const filtered = sampleTransactions.filter(txn => {
+    const txnDate = new Date(txn.date);
+    return txn.truckId === selectedTruck &&
+      txn.status === selectedStatus &&
+      txnDate >= threeMonthsAgo;
+  });
+
+  if (filtered.length === 0) {
+    showFloatingMessage(`No ${selectedStatus.toLowerCase()} transactions found for selected truck in last 3 months.`, "warning");
+    return;
+  }
+
+  // Populate the results in HTML
+  filtered.forEach(txn => {
+    const li = document.createElement('li');
+    li.textContent = `Date: ${txn.date}, Amount: ₹${txn.amount}`;
+    resultList.appendChild(li);
+  });
+
+  resultDiv.style.display = 'block';
+});
+
+// Trigger transaction filtering when vehicle is changed
+document.getElementById('vehicleSelect').addEventListener('change', () => {
+  // Re-run the payment status change logic
+  paymentList.dispatchEvent(new Event('change'));
+});
 
     // Save button redirects to dashboard (you can replace with form submission logic)
     saveBtn.addEventListener('click', () => {
@@ -256,11 +325,98 @@
 
     // Notify button (stub)
     notifyBtn.addEventListener('click', () => {
-      alert('Notification sent to payer!');
+      const amount = document.getElementById('amountInput').value;
+
+      if (!amount || parseFloat(amount) <= 0) {
+        showFloatingMessage("Please enter a valid income amount before notifying.", "error");
+        return;
+      }
+
+      const days = prompt('Enter number of days to notify payer:', '3');
+
+      if (days !== null && days.trim() !== '' && !isNaN(days)) {
+        showFloatingMessage(`Notification will be sent to the payer for ₹${parseFloat(amount).toFixed(2)} after ${days} day(s).`, "success");
+      } else {
+        showFloatingMessage("Notification cancelled. Invalid number of days.", "warning");
+      }
     });
+
 
     // Initialize attachments UI in case no files are attached
     updateAttachmentUI();
+
+    function showFloatingMessage(message, type = "info") {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('toast-message');
+      msgDiv.textContent = message;
+
+      // Style base
+      msgDiv.style.position = 'fixed';
+      msgDiv.style.top = '20px';
+      msgDiv.style.right = '20px';
+      msgDiv.style.padding = '12px 20px';
+      msgDiv.style.borderRadius = '6px';
+      msgDiv.style.zIndex = '9999';
+      msgDiv.style.fontSize = '15px';
+      msgDiv.style.fontWeight = '500';
+      msgDiv.style.boxShadow = '0 4px 10px rgba(0, 0, 0, 0.15)';
+      msgDiv.style.opacity = '0';
+      msgDiv.style.transition = 'opacity 0.4s ease';
+      msgDiv.style.maxWidth = '350px';
+      msgDiv.style.marginBottom = '10px';
+      msgDiv.style.color = '#fff';
+
+      // Color based on type
+      switch (type) {
+        case "success":
+          msgDiv.style.backgroundColor = "#28a745";
+          break;
+        case "warning":
+          msgDiv.style.backgroundColor = "#ffc107";
+          msgDiv.style.color = "#212529";
+          break;
+        case "error":
+          msgDiv.style.backgroundColor = "#dc3545";
+          break;
+        default:
+          msgDiv.style.backgroundColor = "#007bff";
+      }
+
+      // Optional: add to a wrapper so multiple messages stack
+      const wrapperId = 'toast-wrapper';
+      let wrapper = document.getElementById(wrapperId);
+      if (!wrapper) {
+        wrapper = document.createElement('div');
+        wrapper.id = wrapperId;
+        wrapper.style.position = 'fixed';
+        wrapper.style.top = '20px';
+        wrapper.style.right = '20px';
+        wrapper.style.zIndex = '9999';
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.gap = '10px';
+        document.body.appendChild(wrapper);
+      }
+
+      wrapper.appendChild(msgDiv);
+
+      // Fade in
+      setTimeout(() => {
+        msgDiv.style.opacity = '1';
+      }, 10);
+
+      // Auto-dismiss after 4 seconds
+      setTimeout(() => {
+        msgDiv.style.opacity = '0';
+        setTimeout(() => {
+          msgDiv.remove();
+          if (wrapper && wrapper.childNodes.length === 0) {
+            wrapper.remove(); // clean up
+          }
+        }, 500);
+      }, 4000);
+    }
+
   </script>
 </body>
 

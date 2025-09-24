@@ -6,6 +6,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Add Expense</title>
   <link rel="stylesheet" href="styles.css" />
+  <style>
+    .custom-category-container {
+      margin-top: 10px;
+    }
+
+    .custom-category-container input {
+      padding: 8px;
+      margin-right: 10px;
+      width: 60%;
+    }
+
+    .custom-category-container button {
+      padding: 8px 12px;
+    }
+  </style>
 </head>
 
 <body>
@@ -22,11 +37,21 @@
     <input type="number" placeholder="₹0.00" />
 
     <label>Category</label>
-    <select>
-      <option>Fuel</option>
-      <option>Repair</option>
-      <option>Toll</option>
+    <select id="categorySelect">
+      <option value="Fuel">Fuel</option>
+      <option value="Repair">Repair</option>
+      <option value="Toll">Toll</option>
+      <option value="Maintenance">Maintenance</option>
+      <option value="EMI">EMI</option>
+      <option value="Driver Salary">Driver Salary</option>
+      <option value="Cleaner Salary">Cleaner Salary</option>
     </select>
+
+    <!-- Custom category add section -->
+    <div class="custom-category-container">
+      <input type="text" id="customCategoryInput" placeholder="Add new category..." />
+      <button class="btn-blue" onclick="addCustomCategory()">Add</button>
+    </div>
 
     <label>Description</label>
     <textarea placeholder="Enter description..."></textarea>
@@ -42,6 +67,39 @@
       <button class="btn-gray" onclick="window.location.href='dashboardPage.html'">Cancel</button>
     </div>
   </div>
+
+  <script>
+    function addCustomCategory() {
+      const input = document.getElementById('customCategoryInput');
+      const select = document.getElementById('categorySelect');
+      const newCategory = input.value.trim();
+
+      if (newCategory === '') {
+        alert('Please enter a category name.');
+        return;
+      }
+
+      // Check if it already exists
+      const exists = Array.from(select.options).some(opt => opt.value.toLowerCase() === newCategory.toLowerCase());
+
+      if (exists) {
+        alert('This category already exists.');
+        return;
+      }
+
+      // Create new option
+      const option = document.createElement('option');
+      option.value = newCategory;
+      option.textContent = newCategory;
+
+      // Add and select it
+      select.appendChild(option);
+      select.value = newCategory;
+
+      // Clear the input
+      input.value = '';
+    }
+  </script>
 </body>
 
 </html>
