@@ -2,8 +2,8 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Add Truck</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -12,7 +12,7 @@
   <div class="container">
     <h2>Add Truck</h2>
 
-    <form class="truck-form">
+    <form class="truck-form" id="truckForm">
       <!-- Vehicle No -->
       <div class="form-section">
         <label for="vehicleNo">Vehicle No.</label>
@@ -126,10 +126,59 @@
 
       <!-- Save Buttons -->
       <div class="actions">
-        <button type="button" class="btn-green" onclick="window.location.href='dashboardPage.html'">Save</button>
+        <button type="button" class="btn-green" id="saveBtn">Save</button>
         <button type="button" class="btn-gray" onclick="window.location.href='dashboardPage.html'">Cancel</button>
       </div>
     </form>
+  </div>
+
+  <script>
+    // Helper: check if a date is within next N days (including past dates)
+    function isDateDue(dateStr, daysAhead = 7) {
+      if (!dateStr) return false;
+      const now = new Date();
+      const date = new Date(dateStr);
+      const diffTime = date.getTime() - now.getTime();
+      const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+      return diffDays <= daysAhead && diffDays >= -1; // Due if within next 7 days or overdue by 1 day
+    }
+
+    function notifyDueDates() {
+      const dateFields = [
+        { id: 'dueDate', label: 'Due Date' },
+        { id: 'pollutionDate', label: 'Pollution Certificate Renewal Date' },
+        { id: 'taxDate', label: 'Tax Date' },
+        { id: 'insuranceDate', label: 'Insurance Date' },
+        { id: 'fcDate', label: 'FC Date' },
+        { id: 'permitDate', label: 'Permit Date' },
+      ];
+
+      const dueNotifications = [];
+
+      dateFields.forEach(field => {
+        const dateValue = document.getElementById(field.id).value;
+        if (isDateDue(dateValue)) {
+          dueNotifications.push(`${field.label} is due soon or overdue! (${dateValue})`);
+        }
+      });
+
+      if (dueNotifications.length > 0) {
+        alert('⚠️ Reminder:\n\n' + dueNotifications.join('\n'));
+      }
+    }
+
+    // Save button click handler
+    document.getElementById('saveBtn').addEventListener('click', () => {
+      // Run notification check
+      notifyDueDates();
+
+      // TODO: Add your save logic here (e.g., save form data, send to server, etc.)
+
+      // Redirect to dashboard after save
+      window.location.href = 'dashboardPage.html';
+    });
+  </script>
 </body>
 
 </html>

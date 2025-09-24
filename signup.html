@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign Up - Lorry App</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <div class="container">
+        <h2>Create Your Account</h2>
+
+        <form id="signupForm" onsubmit="return createAccount()">
+            <label for="fullName">Full Name *</label>
+            <input type="text" id="fullName" name="fullName" placeholder="Your full name" required />
+
+            <label for="phoneNumber">Phone Number *</label>
+            <input type="tel" id="phoneNumber" name="phoneNumber" maxlength="10" pattern="[6-9]{1}[0-9]{9}"
+                placeholder="10-digit phone number" required />
+            <small>We'll send an OTP to verify your number.</small>
+            </br></br>
+
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="Your email address" />
+
+            <label for="password">Password *</label>
+            <input type="password" id="password" name="password" placeholder="Create a password" required />
+
+            <label for="confirmPassword">Confirm Password *</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password"
+                required />
+
+            <label for="address">Address</label>
+            <textarea id="address" name="address" placeholder="Street, Apartment, etc."></textarea>
+
+            <label for="city">City</label>
+            <input type="text" id="city" name="city" placeholder="Your city" />
+
+            <label for="state">State / Province</label>
+            <input type="text" id="state" name="state" placeholder="Your state or province" />
+
+            <label for="zip">Zip / Postal Code</label>
+            <input type="text" id="zip" name="zip" placeholder="Zip or postal code" />
+
+            <label for="company">Company Name (optional)</label>
+            <input type="text" id="company" name="company" placeholder="Company or business name" />
+
+            <button type="submit" class="btn-green">Create Account</button>
+        </form>
+
+        <div class="login-link" style="text-align:center; margin-top:15px;">
+            Already have an account? <a href="index.html"
+                style="color: green; font-weight: 600; text-decoration:none;">Login here</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("phoneNumber").addEventListener("input", function (e) {
+            this.value = this.value.replace(/\D/g, "");
+        });
+
+        function createAccount() {
+            const fullName = document.getElementById("fullName").value.trim();
+            const phone = document.getElementById("phoneNumber").value;
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            if (!fullName) {
+                alert("Please enter your full name.");
+                return false;
+            }
+            if (phone.length !== 10) {
+                alert("Please enter a valid 10-digit phone number.");
+                return false;
+            }
+            if (password.length < 6) {
+                alert("Password must be at least 6 characters long.");
+                return false;
+            }
+            if (password !== confirmPassword) {
+                alert("Passwords do not match.");
+                return false;
+            }
+
+            let users = JSON.parse(localStorage.getItem('users')) || [];
+
+            // Check if phone number already registered
+            if (users.find(u => u.phone === phone)) {
+                alert("Phone number already registered. Please login.");
+                return false;
+            }
+
+            const newUser = { fullName, phone, password };
+            users.push(newUser);
+
+            localStorage.setItem('users', JSON.stringify(users));
+
+            alert(`Thank you for signing up, ${fullName}! Please login now.`);
+
+            window.location.href = "index.html";
+
+            return false;
+        }
+
+    </script>
+</body>
+
+</html>
