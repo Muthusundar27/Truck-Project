@@ -153,7 +153,7 @@
     </select>
     <div id="transactionResults"
       style="margin-top: 20px; padding: 10px; border: 1px solid #ddd; border-radius: 6px; background: #f9f9f9; display: none;">
-      <strong>Filtered Transactions:</strong>
+      <strong id="transactionHeader">Filtered Transactions:</strong>
       <ul id="transactionList" style="margin-top: 10px; padding-left: 20px;"></ul>
     </div>
 
@@ -250,65 +250,71 @@
 
     // Payment List dropdown logic
     // Sample transactions data (you can replace this with real data from backend later)
-const sampleTransactions = [
-  { truckId: 'truck1', status: 'Pending', date: '2025-08-20', amount: 5000 },
-  { truckId: 'truck1', status: 'Complete', date: '2025-07-12', amount: 8000 },
-  { truckId: 'truck2', status: 'Pending', date: '2025-06-05', amount: 3000 },
-  { truckId: 'truck1', status: 'Complete', date: '2025-09-10', amount: 9000 },
-  { truckId: 'truck2', status: 'Complete', date: '2025-07-25', amount: 7500 },
-  { truckId: 'truck1', status: 'Pending', date: '2025-09-01', amount: 2000 },
-];
+    const sampleTransactions = [
+      { truckId: 'truck1', status: 'Pending', date: '2025-08-20', amount: 5000 },
+      { truckId: 'truck1', status: 'Complete', date: '2025-07-12', amount: 8000 },
+      { truckId: 'truck2', status: 'Pending', date: '2025-06-05', amount: 3000 },
+      { truckId: 'truck1', status: 'Complete', date: '2025-09-10', amount: 9000 },
+      { truckId: 'truck2', status: 'Complete', date: '2025-07-25', amount: 7500 },
+      { truckId: 'truck1', status: 'Pending', date: '2025-09-01', amount: 2000 },
+    ];
 
-paymentList.addEventListener('change', () => {
-  const selectedStatus = paymentList.value;
-  const selectedTruck = document.getElementById('vehicleSelect').value;
-  const resultDiv = document.getElementById('transactionResults');
-  const resultList = document.getElementById('transactionList');
+    paymentList.addEventListener('change', () => {
+      const selectedStatus = paymentList.value;
+      const selectedTruck = document.getElementById('vehicleSelect').value;
+      const resultDiv = document.getElementById('transactionResults');
+      const resultList = document.getElementById('transactionList');
 
-  resultList.innerHTML = '';
-  resultDiv.style.display = 'none';
+      resultList.innerHTML = '';
+      resultDiv.style.display = 'none';
 
-  if (!selectedStatus) {
-    showFloatingMessage("Please select a payment status to filter.", "warning");
-    return;
-  }
+      if (!selectedStatus) {
+        showFloatingMessage("Please select a payment status to filter.", "warning");
+        return;
+      }
 
-  if (!selectedTruck) {
-    showFloatingMessage("Please select a truck to view transactions.", "error");
-    return;
-  }
+      if (!selectedTruck) {
+        showFloatingMessage("Please select a truck to view transactions.", "error");
+        return;
+      }
 
-  const now = new Date();
-  const threeMonthsAgo = new Date();
-  threeMonthsAgo.setMonth(now.getMonth() - 3);
+      const now = new Date();
+      const threeMonthsAgo = new Date();
+      threeMonthsAgo.setMonth(now.getMonth() - 3);
 
-  const filtered = sampleTransactions.filter(txn => {
-    const txnDate = new Date(txn.date);
-    return txn.truckId === selectedTruck &&
-      txn.status === selectedStatus &&
-      txnDate >= threeMonthsAgo;
-  });
+      const filtered = sampleTransactions.filter(txn => {
+        const txnDate = new Date(txn.date);
+        return txn.truckId === selectedTruck &&
+          txn.status === selectedStatus &&
+          txnDate >= threeMonthsAgo;
+      });
 
-  if (filtered.length === 0) {
-    showFloatingMessage(`No ${selectedStatus.toLowerCase()} transactions found for selected truck in last 3 months.`, "warning");
-    return;
-  }
+      if (filtered.length === 0) {
+        showFloatingMessage(`No ${selectedStatus.toLowerCase()} transactions found for selected truck in last 3 months.`, "warning");
+        return;
+      }
 
-  // Populate the results in HTML
-  filtered.forEach(txn => {
-    const li = document.createElement('li');
-    li.textContent = `Date: ${txn.date}, Amount: ₹${txn.amount}`;
-    resultList.appendChild(li);
-  });
+      // Set header dynamically
+      const headerLabel = selectedStatus === 'Pending' ? 'Pending Transactions:' : 'Complete Transactions:';
+      const dateLabel = selectedStatus === 'Pending' ? 'Last Notified Date' : 'Transaction Complete Date';
+      const amountLabel = selectedStatus === 'Pending' ? 'Pending Amount' : 'Amount Received';
 
-  resultDiv.style.display = 'block';
-});
+      document.getElementById('transactionHeader').textContent = headerLabel;
 
-// Trigger transaction filtering when vehicle is changed
-document.getElementById('vehicleSelect').addEventListener('change', () => {
-  // Re-run the payment status change logic
-  paymentList.dispatchEvent(new Event('change'));
-});
+      filtered.forEach(txn => {
+        const li = document.createElement('li');
+        li.textContent = `${dateLabel}: ${txn.date}, ${amountLabel}: ₹${txn.amount}`;
+        resultList.appendChild(li);
+      });
+
+      resultDiv.style.display = 'block';
+    });
+
+    // Trigger transaction filtering when vehicle is changed
+    document.getElementById('vehicleSelect').addEventListener('change', () => {
+      // Re-run the payment status change logic
+      paymentList.dispatchEvent(new Event('change'));
+    });
 
     // Save button redirects to dashboard (you can replace with form submission logic)
     saveBtn.addEventListener('click', () => {
