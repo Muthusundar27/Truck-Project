@@ -5,98 +5,209 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OTP Verification</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: #f8f9fa;
-            font-family: Arial;
-        }
-
-        .card {
-            background: #fff;
-            padding: 25px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            width: 350px;
-        }
-
-        .otp-box input {
-            width: 40px;
-            height: 50px;
-            font-size: 22px;
-            text-align: center;
-            margin: 5px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-        }
-
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 15px;
-            background: green;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        small {
-            color: gray;
-            display: block;
-            margin-top: 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 
-<body>
-    <div class="card">
-        <h2>Enter OTP</h2>
-        <p>Check your phone for the code</p>
-        <div class="otp-box">
-            <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1"
-                oninput="this.value=this.value.replace(/[^0-9]/g,''); moveToNext(this, 'otp2')" id="otp1">
+<body class="otp-container">
+    <div class="otp-card">
+        <h1>Enter OTP</h1>
+        <p>Please enter the verification code sent to your phone</p>
+        
+        <form id="otpForm" onsubmit="verifyOTP(event)">
+            <div class="otp-box" role="group" aria-labelledby="otp-label">
+                <span id="otp-label" class="sr-only">Enter 5-digit OTP code</span>
+                
+                <input type="tel" 
+                    inputmode="numeric" 
+                    pattern="[0-9]*" 
+                    maxlength="1"
+                    class="otp-input"
+                    aria-label="First digit"
+                    autocomplete="one-time-code"
+                    required
+                    id="otp1">
 
-            <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1"
-                oninput="this.value=this.value.replace(/[^0-9]/g,''); moveToNext(this, 'otp3')"
-                onkeydown="moveBack(this, event, 'otp1')" id="otp2">
+                <input type="tel" 
+                    inputmode="numeric" 
+                    pattern="[0-9]*" 
+                    maxlength="1"
+                    class="otp-input"
+                    aria-label="Second digit"
+                    required
+                    id="otp2">
 
-            <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1"
-                oninput="this.value=this.value.replace(/[^0-9]/g,''); moveToNext(this, 'otp4')"
-                onkeydown="moveBack(this, event, 'otp2')" id="otp3">
+                <input type="tel" 
+                    inputmode="numeric" 
+                    pattern="[0-9]*" 
+                    maxlength="1"
+                    class="otp-input"
+                    aria-label="Third digit"
+                    required
+                    id="otp3">
 
-            <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1"
-                oninput="this.value=this.value.replace(/[^0-9]/g,''); moveToNext(this, 'otp5')"
-                onkeydown="moveBack(this, event, 'otp3')" id="otp4">
+                <input type="tel" 
+                    inputmode="numeric" 
+                    pattern="[0-9]*" 
+                    maxlength="1"
+                    class="otp-input"
+                    aria-label="Fourth digit"
+                    required
+                    id="otp4">
 
-            <input type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="1"
-                oninput="this.value=this.value.replace(/[^0-9]/g,'');" onkeydown="moveBack(this, event, 'otp4')"
-                id="otp5">
+                <input type="tel" 
+                    inputmode="numeric" 
+                    pattern="[0-9]*" 
+                    maxlength="1"
+                    class="otp-input"
+                    aria-label="Fifth digit"
+                    required
+                    id="otp5">
+            </div>
+
+            <div id="error-message" class="error-message" role="alert" aria-live="polite"></div>
+            
+            <button type="submit" class="btn-green">Verify OTP</button>
+        </form>
+
+        <div class="resend-timer">
+            <span id="timer">Resend code in <span id="countdown">30</span>s</span>
+            <button id="resendButton" class="resend-link" onclick="resendOTP()" disabled>Resend code</button>
         </div>
-
-        <button onclick="verifyOTP()">Verify OTP</button>
-        <small>Resend OTP in 30s</small>
     </div>
 
     <script>
-        function moveToNext(current, nextFieldID) {
-            if (current.value.length === 1) {
-                document.getElementById(nextFieldID)?.focus();
-            }
+        // Initialize OTP inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = [...document.querySelectorAll('.otp-input')];
+            
+            inputs.forEach((input, index) => {
+                // Handle input
+                input.addEventListener('input', (e) => {
+                    const value = e.target.value;
+                    
+                    // Remove non-numeric characters
+                    e.target.value = value.replace(/[^0-9]/g, '');
+                    
+                    // Move to next input if value is entered
+                    if (value && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+
+                    // Check if all inputs are filled
+                    if (inputs.every(input => input.value)) {
+                        document.querySelector('button[type="submit"]').focus();
+                    }
+                });
+
+                // Handle keyboard
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                        // Move to previous input on backspace
+                        inputs[index - 1].focus();
+                    } else if (e.key === 'ArrowLeft' && index > 0) {
+                        // Move left
+                        inputs[index - 1].focus();
+                    } else if (e.key === 'ArrowRight' && index < inputs.length - 1) {
+                        // Move right
+                        inputs[index + 1].focus();
+                    }
+                });
+
+                // Handle paste
+                input.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const pastedText = (e.clipboardData || window.clipboardData).getData('text');
+                    const digits = pastedText.match(/\d/g);
+                    
+                    if (digits) {
+                        inputs.forEach((input, i) => {
+                            if (digits[i]) {
+                                input.value = digits[i];
+                            }
+                        });
+                        // Focus last input or first empty input
+                        const emptyInput = inputs.find(input => !input.value);
+                        (emptyInput || inputs[inputs.length - 1]).focus();
+                    }
+                });
+            });
+
+            // Start countdown timer
+            startTimer();
+        });
+
+        // Timer functionality
+        let timeLeft = 30;
+        let timerId = null;
+
+        function startTimer() {
+            const timerDisplay = document.getElementById('countdown');
+            const resendButton = document.getElementById('resendButton');
+            
+            clearInterval(timerId);
+            timeLeft = 30;
+            resendButton.disabled = true;
+            
+            timerId = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerId);
+                    document.getElementById('timer').style.display = 'none';
+                    resendButton.disabled = false;
+                }
+            }, 1000);
         }
 
-        function moveBack(current, event, previousFieldID) {
-            if (event.key === "Backspace" && current.value.length === 0) {
-                document.getElementById(previousFieldID)?.focus();
-            }
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            
+            // Add error class to inputs
+            document.querySelectorAll('.otp-input').forEach(input => {
+                input.classList.add('error');
+            });
+
+            // Remove error class after animation
+            setTimeout(() => {
+                document.querySelectorAll('.otp-input').forEach(input => {
+                    input.classList.remove('error');
+                });
+            }, 500);
         }
-        function verifyOTP() {
-            // alert("OTP Verified!");
+
+        function resendOTP() {
+            // Reset inputs
+            document.querySelectorAll('.otp-input').forEach(input => {
+                input.value = '';
+            });
+            document.getElementById('timer').style.display = 'inline';
+            document.getElementById('error-message').style.display = 'none';
+            
+            // Restart timer
+            startTimer();
+            
+            // TODO: Implement actual OTP resend logic here
+        }
+
+        function verifyOTP(event) {
+            event.preventDefault();
+            
+            // Get OTP value
+            const otp = [...document.querySelectorAll('.otp-input')]
+                .map(input => input.value)
+                .join('');
+
+            // Validate OTP length
+            if (otp.length !== 5) {
+                showError('Please enter all 5 digits');
+                return;
+            }
+
+            // TODO: Add actual OTP verification logic here
+            // For now, just redirect to dashboard
             window.location.href = "dashboardPage.html";
         }
     </script>
