@@ -5,80 +5,37 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login - Lorry App</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #f8f9fa;
-    }
-
-    .card {
-      background: #fff;
-      padding: 25px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      width: 350px;
-      text-align: center;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      margin: 12px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      background: green;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #587a58;
-    }
-
-    small {
-      color: gray;
-    }
-
-    .signup-link {
-      margin-top: 15px;
-      font-size: 14px;
-    }
-
-    .signup-link a {
-      color: green;
-      text-decoration: none;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    .signup-link a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 
-<body>
-  <div class="card">
-    <h2>Welcome!</h2>
+<body class="login-page">
+  <div class="login-card">
+    <h1>Welcome!</h1>
     <p>Enter your phone number</p>
-    <input type="tel" id="phoneNumber" maxlength="10" pattern="[6-9]{1}[0-9]{9}" placeholder="Enter 10-digit number"
-      required />
-    <input type="password" id="password" placeholder="Enter password" required />
-    <button onclick="login()">Login</button>
-    <small>Use your registered phone number & password</small>
+    <form id="loginForm" class="login-form" onsubmit="login(event)">
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number</label>
+        <input type="tel" id="phoneNumber" name="phoneNumber" 
+          maxlength="10" minlength="10" 
+          pattern="[6-9]{1}[0-9]{9}" 
+          placeholder="Enter 10-digit number"
+          aria-describedby="phoneHint"
+          required />
+        <small id="phoneHint" class="input-hint">
+          📱 Please enter the phone number you used during registration
+        </small>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" 
+          placeholder="Enter password" 
+          autocomplete="current-password"
+          required />
+      </div>
+
+      <button type="submit" class="btn-green">Login</button>
+    </form>
 
     <div class="signup-link">
       New user? <a href="signup.html">Sign up here</a>
@@ -86,43 +43,84 @@
   </div>
 
   <script>
-    document.getElementById("phoneNumber").addEventListener("input", function (e) {
+    // Show error message below the input
+    function showError(inputId, message) {
+      const input = document.getElementById(inputId);
+      let errorDiv = input.parentElement.querySelector('.error-message');
+      
+      if (!errorDiv) {
+        errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+        errorDiv.style.color = 'red';
+        errorDiv.style.fontSize = '14px';
+        errorDiv.style.marginTop = '5px';
+        input.parentElement.appendChild(errorDiv);
+      }
+      
+      errorDiv.textContent = message;
+      input.setAttribute('aria-invalid', 'true');
+      input.focus();
+    }
+
+    // Clear error message
+    function clearError(inputId) {
+      const input = document.getElementById(inputId);
+      const errorDiv = input.parentElement.querySelector('.error-message');
+      if (errorDiv) {
+        errorDiv.remove();
+      }
+      input.removeAttribute('aria-invalid');
+    }
+
+    // Phone number input validation
+    document.getElementById("phoneNumber").addEventListener("input", function(e) {
       this.value = this.value.replace(/\D/g, ""); // Only digits
+      clearError('phoneNumber');
     });
 
-    function login() {
+    // Login form submission
+    function login(event) {
+      event.preventDefault();
+      
       const phone = document.getElementById("phoneNumber").value;
       const password = document.getElementById("password").value;
 
+      // Clear any existing errors
+      clearError('phoneNumber');
+      clearError('password');
+
+      // Validate inputs
       if (phone.length !== 10) {
-        alert("Please enter a valid 10-digit phone number.");
+        showError('phoneNumber', "Please enter a valid 10-digit phone number.");
         return;
       }
+      
       if (!password) {
-        alert("Please enter your password.");
+        showError('password', "Please enter your password.");
         return;
       }
 
+      // Check user credentials
       let users = JSON.parse(localStorage.getItem('users')) || [];
       const user = users.find(u => u.phone === phone);
 
       if (!user) {
-        alert("Phone number not registered. Please sign up first.");
+        showError('phoneNumber', "Phone number not registered. Please sign up first.");
         return;
       }
 
       if (user.password !== password) {
-        alert("Incorrect password. Please try again.");
+        showError('password', "Incorrect password. Please try again.");
         return;
       }
 
       // Save logged in user info to localStorage
       localStorage.setItem('currentUser', JSON.stringify(user));
 
-      // Redirect to dashboard
+      // Redirect to OTP verification
       window.location.href = "otpVerificationPage.html";
     }
   </script>
 </body>
 
-</html> 
+</html>
