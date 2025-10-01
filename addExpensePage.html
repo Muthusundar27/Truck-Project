@@ -7,18 +7,164 @@
   <title>Add Expense</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    .custom-category-container {
-      margin-top: 10px;
+    /* Required field indicator */
+    .required {
+      color: #dc3545;
+      margin-left: 4px;
     }
 
-    .custom-category-container input {
-      padding: 8px;
-      margin-right: 10px;
-      width: 60%;
+    /* Form validation styles */
+    .form-submitted input[required]:invalid,
+    .form-submitted select[required]:invalid,
+    .form-submitted textarea[required]:invalid,
+    input[required].touched:invalid,
+    select[required].touched:invalid,
+    textarea[required].touched:invalid {
+      border-color: #dc3545;
+      border-width: 1px;
+      border-style: solid;
     }
 
-    .custom-category-container button {
-      padding: 8px 12px;
+    .form-submitted input[required]:invalid:focus,
+    .form-submitted select[required]:invalid:focus,
+    .form-submitted textarea[required]:invalid:focus,
+    input[required].touched:invalid:focus,
+    select[required].touched:invalid:focus,
+    textarea[required].touched:invalid:focus {
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
+
+    /* Reset default invalid styles */
+    input:invalid,
+    select:invalid,
+    textarea:invalid {
+      border-color: #ced4da;
+      box-shadow: none;
+    }
+
+
+
+    /* Attachments styles */
+    .attachments-list {
+      margin-bottom: 25px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 6px;
+      background: #fafafa;
+      display: none;
+    }
+
+    .attachment-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .attachment-preview {
+      width: 60px;
+      height: 60px;
+      margin-right: 15px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .attachment-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .attachment-icon {
+      width: 60px;
+      height: 60px;
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+
+    .attachment-info {
+      flex: 1;
+    }
+
+    .attachment-name {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 4px;
+      word-break: break-all;
+    }
+
+    .attachment-time {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .remove-attachment {
+      padding: 4px 8px;
+      margin: 0;
+      font-size: 20px;
+      color: #dc3545;
+      background: none;
+      border: none;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+
+    .remove-attachment:hover {
+      opacity: 1;
+    }
+
+    /* Button loading state */
+    button {
+      position: relative;
+    }
+
+    button.loading {
+      color: transparent;
+    }
+
+    button.loading::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 50%;
+      left: 50%;
+      margin: -8px 0 0 -8px;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      border-right-color: transparent;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Toast message */
+    .toast-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: 6px;
+      z-index: 9999;
+      font-size: 15px;
+      font-weight: 500;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      max-width: 350px;
+      opacity: 0;
+      transition: opacity 0.4s ease;
     }
   </style>
 </head>
@@ -27,17 +173,19 @@
   <div class="container">
     <h2>Add Expense</h2>
 
-    <label>Select Vehicle</label>
-    <select>
-      <option>🚛 Truck 1</option>
-      <option>🚛 Truck 2</option>
+    <label for="vehicleSelect">Select Vehicle<span class="required">*</span></label>
+    <select id="vehicleSelect" required aria-required="true">
+      <option value="">-- Select Vehicle --</option>
+      <option value="truck1">🚛 Truck 1</option>
+      <option value="truck2">🚛 Truck 2</option>
     </select>
 
-    <label>Amount</label>
-    <input type="number" placeholder="₹0.00" />
+    <label for="amountInput">Amount<span class="required">*</span></label>
+    <input id="amountInput" type="number" placeholder="₹0.00" min="0" max="9999999999" step="0.01" required aria-required="true" />
 
-    <label>Category</label>
-    <select id="categorySelect">
+    <label for="categorySelect">Category<span class="required">*</span></label>
+    <select id="categorySelect" required aria-required="true">
+      <option value="">-- Select Category --</option>
       <option value="Fuel">Fuel</option>
       <option value="Repair">Repair</option>
       <option value="Toll">Toll</option>
@@ -45,60 +193,281 @@
       <option value="EMI">EMI</option>
       <option value="Driver Salary">Driver Salary</option>
       <option value="Cleaner Salary">Cleaner Salary</option>
+      <option value="Insurance">Insurance</option>
+      <option value="Permits">Permits & Licenses</option>
+      <option value="Parking">Parking</option>
+      <option value="Other">Other</option>
     </select>
 
-    <!-- Custom category add section -->
-    <div class="custom-category-container">
-      <input type="text" id="customCategoryInput" placeholder="Add new category..." />
-      <button class="btn-blue" onclick="addCustomCategory()">Add</button>
+    <label for="descriptionInput">Description</label>
+    <textarea id="descriptionInput" placeholder="Enter description..." maxlength="500"></textarea>
+
+    <label for="otherDetailsInput">Other Details</label>
+    <textarea id="otherDetailsInput" placeholder="Add more details..." maxlength="1000"></textarea>
+
+    <label for="attachFile">Attach File<span class="required">*</span></label>
+    <input id="attachFile" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" 
+      aria-label="Upload supporting documents" required aria-required="true" />
+
+    <!-- List of uploaded attachments -->
+    <div class="attachments-list" id="attachmentsList">
+      <strong>Uploaded Attachments:</strong>
+      <div id="attachmentItems"></div>
     </div>
 
-    <label>Description</label>
-    <textarea placeholder="Enter description..."></textarea>
-
-    <label>Other Details</label>
-    <textarea placeholder="Add more details..."></textarea>
-
-    <label>Attach File</label>
-    <input type="file" multiple />
-
     <div class="actions">
-      <button class="btn-green" onclick="window.location.href='dashboardPage.html'">Save</button>
-      <button class="btn-gray" onclick="window.location.href='dashboardPage.html'">Cancel</button>
+      <button type="button" class="btn-green" id="saveBtn">Save</button>
+      <button type="button" class="btn-gray" id="cancelBtn">Cancel</button>
     </div>
   </div>
 
   <script>
-    function addCustomCategory() {
-      const input = document.getElementById('customCategoryInput');
-      const select = document.getElementById('categorySelect');
-      const newCategory = input.value.trim();
+    // Initialize variables
+    const attachmentsList = document.getElementById('attachmentsList');
+    const attachmentItems = document.getElementById('attachmentItems');
+    const attachFileInput = document.getElementById('attachFile');
+    const saveBtn = document.getElementById('saveBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const categorySelect = document.getElementById('categorySelect');
 
-      if (newCategory === '') {
-        alert('Please enter a category name.');
+    let attachments = [];
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+
+    // Add blur event listeners to required fields
+    document.querySelectorAll('[required]').forEach(field => {
+      field.addEventListener('blur', () => {
+        field.classList.add('touched');
+      });
+    });
+
+    // File handling
+    attachFileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      let totalSize = 0;
+      
+      for (const file of files) {
+        totalSize += file.size;
+        if (!file.type.match(/(image\/jpeg|image\/png|application\/pdf|application\/msword|application\/vnd.openxmlformats-officedocument.wordprocessingml.document)/)) {
+          showFloatingMessage("Invalid file type. Please upload only PDF, JPG, PNG, DOC or DOCX files.", "error");
+          e.target.value = '';
+          return;
+        }
+      }
+
+      if (totalSize > MAX_FILE_SIZE) {
+        showFloatingMessage("Total file size exceeds 10MB limit", "error");
+        e.target.value = '';
         return;
       }
 
-      // Check if it already exists
-      const exists = Array.from(select.options).some(opt => opt.value.toLowerCase() === newCategory.toLowerCase());
+      files.forEach(file => {
+        const timestamp = getTimestamp();
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          attachments.push({ 
+            name: file.name, 
+            timestamp,
+            preview: file.type.startsWith('image/') ? e.target.result : null 
+          });
+          updateAttachmentUI();
+        };
+        
+        if (file.type.startsWith('image/')) {
+          reader.readAsDataURL(file);
+        } else {
+          reader.readAsArrayBuffer(file);
+        }
+      });
+    });
 
-      if (exists) {
-        alert('This category already exists.');
-        return;
+    function updateAttachmentUI() {
+      if (attachments.length === 0) {
+        attachmentsList.style.display = 'none';
+        attachmentItems.innerHTML = '';
+        attachFileInput.disabled = false;
+      } else {
+        attachmentsList.style.display = 'block';
+        // Sort attachments by timestamp descending
+        attachments.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
+        attachmentItems.innerHTML = attachments.map(att => {
+          const formattedDate = formatTimestamp(att.timestamp);
+          const previewHtml = att.preview ? 
+            `<div class="attachment-preview"><img src="${att.preview}" alt="Preview of ${att.name}" /></div>` : 
+            `<div class="attachment-icon">${getFileIcon(att.name)}</div>`;
+          
+          return `
+            <div class="attachment-item">
+              ${previewHtml}
+              <div class="attachment-info">
+                <div class="attachment-name">${att.name}</div>
+                <div class="attachment-time">Uploaded: ${formattedDate}</div>
+              </div>
+              <button class="remove-attachment" onclick="removeAttachment('${att.timestamp}')" aria-label="Remove ${att.name}">×</button>
+            </div>`;
+        }).join('');
+        attachFileInput.disabled = false;
       }
-
-      // Create new option
-      const option = document.createElement('option');
-      option.value = newCategory;
-      option.textContent = newCategory;
-
-      // Add and select it
-      select.appendChild(option);
-      select.value = newCategory;
-
-      // Clear the input
-      input.value = '';
     }
+
+    function removeAttachment(timestamp) {
+      attachments = attachments.filter(att => att.timestamp !== timestamp);
+      updateAttachmentUI();
+      showFloatingMessage('Attachment removed', 'info');
+    }
+
+    // Save functionality
+    saveBtn.addEventListener('click', async () => {
+      const form = document.querySelector('.container');
+      const requiredFields = form.querySelectorAll('[required]');
+      let isValid = true;
+
+      // Add form-submitted class to container to show all validation states
+      form.classList.add('form-submitted');
+
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          isValid = false;
+          field.classList.add('touched');
+          field.reportValidity();
+        }
+      });
+
+      if (!isValid) {
+        showFloatingMessage("Please fill in all required fields", "error");
+        return;
+      }
+
+      const amount = document.getElementById('amountInput').value;
+      if (parseFloat(amount) <= 0) {
+        showFloatingMessage("Please enter a valid amount", "error");
+        return;
+      }
+
+      try {
+        saveBtn.classList.add('loading');
+        saveBtn.disabled = true;
+        
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        showFloatingMessage('Expense saved successfully!', 'success');
+        setTimeout(() => {
+          window.location.href = 'dashboardPage.html';
+        }, 1000);
+      } catch (error) {
+        showFloatingMessage('Error saving expense. Please try again.', 'error');
+        saveBtn.classList.remove('loading');
+        saveBtn.disabled = false;
+      }
+    });
+
+    // Cancel functionality
+    cancelBtn.addEventListener('click', () => {
+      const hasChanges = document.getElementById('amountInput').value || 
+                        document.getElementById('descriptionInput').value ||
+                        document.getElementById('otherDetailsInput').value ||
+                        attachments.length > 0;
+                        
+      if (!hasChanges || confirm('Are you sure you want to cancel? Unsaved data will be lost.')) {
+        window.location.href = 'dashboardPage.html';
+      }
+    });
+
+    // Utility functions
+    function getTimestamp() {
+      const d = new Date();
+      return d.getFullYear() +
+        String(d.getMonth() + 1).padStart(2, '0') +
+        String(d.getDate()).padStart(2, '0') +
+        String(d.getHours()).padStart(2, '0') +
+        String(d.getMinutes()).padStart(2, '0') +
+        String(d.getSeconds()).padStart(2, '0');
+    }
+
+    function formatTimestamp(timestamp) {
+      const year = timestamp.slice(0, 4);
+      const month = timestamp.slice(4, 6);
+      const day = timestamp.slice(6, 8);
+      const hour = timestamp.slice(8, 10);
+      const minute = timestamp.slice(10, 12);
+      return `${day}/${month}/${year} ${hour}:${minute}`;
+    }
+
+    function getFileIcon(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      const icons = {
+        'pdf': '📄',
+        'doc': '📝',
+        'docx': '📝',
+        'jpg': '🖼️',
+        'jpeg': '🖼️',
+        'png': '🖼️'
+      };
+      return icons[ext] || '📎';
+    }
+
+    function showFloatingMessage(message, type = "info") {
+      const msgDiv = document.createElement('div');
+      msgDiv.classList.add('toast-message');
+      msgDiv.textContent = message;
+
+      // Color based on type
+      switch (type) {
+        case "success":
+          msgDiv.style.backgroundColor = "#28a745";
+          msgDiv.style.color = "#fff";
+          break;
+        case "warning":
+          msgDiv.style.backgroundColor = "#ffc107";
+          msgDiv.style.color = "#212529";
+          break;
+        case "error":
+          msgDiv.style.backgroundColor = "#dc3545";
+          msgDiv.style.color = "#fff";
+          break;
+        default:
+          msgDiv.style.backgroundColor = "#007bff";
+          msgDiv.style.color = "#fff";
+      }
+
+      // Optional: add to a wrapper so multiple messages stack
+      const wrapperId = 'toast-wrapper';
+      let wrapper = document.getElementById(wrapperId);
+      if (!wrapper) {
+        wrapper = document.createElement('div');
+        wrapper.id = wrapperId;
+        wrapper.style.position = 'fixed';
+        wrapper.style.top = '20px';
+        wrapper.style.right = '20px';
+        wrapper.style.zIndex = '9999';
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.gap = '10px';
+        document.body.appendChild(wrapper);
+      }
+
+      wrapper.appendChild(msgDiv);
+
+      // Fade in
+      setTimeout(() => {
+        msgDiv.style.opacity = '1';
+      }, 10);
+
+      // Auto-dismiss after 4 seconds
+      setTimeout(() => {
+        msgDiv.style.opacity = '0';
+        setTimeout(() => {
+          msgDiv.remove();
+          if (wrapper && wrapper.childNodes.length === 0) {
+            wrapper.remove();
+          }
+        }, 500);
+      }, 4000);
+    }
+
+    // Initialize attachments UI
+    updateAttachmentUI();
   </script>
 </body>
 

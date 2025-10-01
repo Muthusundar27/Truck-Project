@@ -45,7 +45,7 @@
     /* Attachments List */
     .attachments-list {
       margin-bottom: 25px;
-      max-height: 150px;
+      max-height: 300px;
       overflow-y: auto;
       border: 1px solid #ddd;
       padding: 10px;
@@ -54,9 +54,92 @@
     }
 
     .attachment-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 10px;
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .attachment-preview {
+      width: 60px;
+      height: 60px;
+      margin-right: 15px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .attachment-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .attachment-icon {
+      width: 60px;
+      height: 60px;
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      background: #f8f9fa;
+      border-radius: 4px;
+    }
+
+    .attachment-info {
+      flex: 1;
+    }
+
+    .attachment-name {
       font-size: 14px;
-      margin-bottom: 6px;
-      color: #555;
+      font-weight: 500;
+      color: #333;
+      margin-bottom: 4px;
+      word-break: break-all;
+    }
+
+    .attachment-time {
+      font-size: 12px;
+      color: #666;
+    }
+
+    .remove-attachment {
+      padding: 4px 8px;
+      margin: 0;
+      font-size: 20px;
+      color: #dc3545;
+      background: none;
+      border: none;
+      cursor: pointer;
+      opacity: 0.7;
+    }
+
+    .remove-attachment:hover {
+      opacity: 1;
+    }
+
+    /* Required field indicator */
+    .required {
+      color: #dc3545;
+      margin-left: 4px;
+    }
+
+    /* Form validation styles */
+    .form-submitted input:invalid,
+    .form-submitted select:invalid,
+    input.touched:invalid,
+    select.touched:invalid {
+      border-color: #dc3545;
+    }
+
+    .form-submitted input:invalid:focus,
+    .form-submitted select:invalid:focus,
+    input.touched:invalid:focus,
+    select.touched:invalid:focus {
+      box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
     }
 
     /* Buttons */
@@ -67,6 +150,29 @@
       font-size: 16px;
       border-radius: 6px;
       margin-right: 12px;
+      position: relative;
+    }
+
+    button.loading {
+      color: transparent;
+    }
+
+    button.loading::after {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 50%;
+      left: 50%;
+      margin: -8px 0 0 -8px;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      border-right-color: transparent;
+      animation: spin 0.75s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
     }
 
     .btn-green {
@@ -74,7 +180,7 @@
       color: white;
     }
 
-    .btn-green:hover {
+    .btn-green:hover:not(.loading) {
       background: #218838;
     }
 
@@ -109,35 +215,39 @@
   <div class="container">
     <h2>Add Income</h2>
 
-    <label for="vehicleSelect">Select Vehicle</label>
-    <select id="vehicleSelect">
+    <label for="vehicleSelect">Select Vehicle<span class="required">*</span></label>
+    <select id="vehicleSelect" required aria-required="true">
+      <option value="">-- Select Vehicle --</option>
       <option value="truck1">🚛 Truck 1</option>
       <option value="truck2">🚛 Truck 2</option>
     </select>
 
-    <label for="amountInput">Amount</label>
-    <input id="amountInput" type="number" placeholder="₹0.00" min="0" />
+    <label for="amountInput">Amount<span class="required">*</span></label>
+    <input id="amountInput" type="number" placeholder="₹0.00" min="0" max="9999999999" required aria-required="true" />
 
     <label for="notesInput">Notes (optional)</label>
-    <textarea id="notesInput" placeholder="Enter note..."></textarea>
+    <textarea id="notesInput" placeholder="Enter note..." maxlength="500"></textarea>
 
-    <label>Payment Status</label>
+    <label>Payment Status<span class="required">*</span></label>
     <div class="radio-group" id="paymentStatusGroup">
       <label><input type="radio" name="status" value="Pending" checked /> Pending</label>
       <label><input type="radio" name="status" value="Complete" /> Complete</label>
     </div>
 
-    <label for="payerCompany">Payer Company Name</label>
-    <input id="payerCompany" type="text" placeholder="Company Name" />
+    <label for="payerCompany">Payer Company Name<span class="required">*</span></label>
+    <input id="payerCompany" type="text" placeholder="Company Name" required aria-required="true" pattern="^[A-Za-z0-9\s\-&.]{3,100}$" title="Company name must be between 3 and 100 characters and can only contain letters, numbers, spaces, hyphens, ampersands and periods" />
 
-    <label for="payerMobile">Payer Mobile Number</label>
-    <input id="payerMobile" type="text" maxlength="10" oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-      placeholder="+91 98765 43210" />
+    <label for="payerMobile">Payer Mobile Number<span class="required">*</span></label>
+    <input id="payerMobile" type="tel" pattern="[0-9]{10}" required aria-required="true" maxlength="10" 
+      oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+      placeholder="10 digit mobile number" 
+      title="Please enter a valid 10-digit mobile number" />
 
-    <button class="btn-blue" id="notifyBtn">Notify</button>
+    <button class="btn-blue" id="notifyBtn" aria-label="Notify payer">Notify</button>
 
     <label for="attachFile">Attach File</label>
-    <input id="attachFile" type="file" multiple />
+    <input id="attachFile" type="file" multiple accept=".pdf,.jpg,.jpeg,.png,.doc,.docx" 
+      aria-label="Upload supporting documents" />
 
     <!-- List of uploaded attachments with timestamps -->
     <div class="attachments-list" id="attachmentsList" style="display:none;">
@@ -230,11 +340,52 @@
         attachmentsList.style.display = 'block';
         // Sort attachments by timestamp descending
         attachments.sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-        attachmentItems.innerHTML = attachments.map(att =>
-          `<div class="attachment-item">${att.name} (Uploaded: ${att.timestamp})</div>`
-        ).join('');
+        attachmentItems.innerHTML = attachments.map(att => {
+          const formattedDate = formatTimestamp(att.timestamp);
+          const previewHtml = att.preview ? 
+            `<div class="attachment-preview"><img src="${att.preview}" alt="Preview of ${att.name}" /></div>` : 
+            `<div class="attachment-icon">${getFileIcon(att.name)}</div>`;
+          
+          return `
+            <div class="attachment-item">
+              ${previewHtml}
+              <div class="attachment-info">
+                <div class="attachment-name">${att.name}</div>
+                <div class="attachment-time">Uploaded: ${formattedDate}</div>
+              </div>
+              <button class="remove-attachment" onclick="removeAttachment('${att.timestamp}')" aria-label="Remove ${att.name}">×</button>
+            </div>`;
+        }).join('');
         attachFileInput.disabled = false;
       }
+    }
+
+    function formatTimestamp(timestamp) {
+      const year = timestamp.slice(0, 4);
+      const month = timestamp.slice(4, 6);
+      const day = timestamp.slice(6, 8);
+      const hour = timestamp.slice(8, 10);
+      const minute = timestamp.slice(10, 12);
+      return `${day}/${month}/${year} ${hour}:${minute}`;
+    }
+
+    function getFileIcon(filename) {
+      const ext = filename.split('.').pop().toLowerCase();
+      const icons = {
+        'pdf': '📄',
+        'doc': '📝',
+        'docx': '📝',
+        'jpg': '🖼️',
+        'jpeg': '🖼️',
+        'png': '🖼️'
+      };
+      return icons[ext] || '📎';
+    }
+
+    function removeAttachment(timestamp) {
+      attachments = attachments.filter(att => att.timestamp !== timestamp);
+      updateAttachmentUI();
+      showFloatingMessage('Attachment removed', 'info');
     }
 
     function getTimestamp() {
@@ -316,15 +467,104 @@
       paymentList.dispatchEvent(new Event('change'));
     });
 
-    // Save button redirects to dashboard (you can replace with form submission logic)
-    saveBtn.addEventListener('click', () => {
-      alert('Form saved successfully! Redirecting to dashboard...');
-      window.location.href = 'dashboardPage.html';
+    // File size validation (10MB limit)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB in bytes
+
+    attachFileInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      let totalSize = 0;
+      
+      for (const file of files) {
+        totalSize += file.size;
+        if (!file.type.match(/(image\/jpeg|image\/png|application\/pdf|application\/msword|application\/vnd.openxmlformats-officedocument.wordprocessingml.document)/)) {
+          showFloatingMessage("Invalid file type. Please upload only PDF, JPG, PNG, DOC or DOCX files.", "error");
+          e.target.value = '';
+          return;
+        }
+      }
+
+      if (totalSize > MAX_FILE_SIZE) {
+        showFloatingMessage("Total file size exceeds 10MB limit", "error");
+        e.target.value = '';
+        return;
+      }
+
+      files.forEach(file => {
+        const timestamp = getTimestamp();
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+          attachments.push({ 
+            name: file.name, 
+            timestamp,
+            preview: file.type.startsWith('image/') ? e.target.result : null 
+          });
+          updateAttachmentUI();
+        };
+        
+        if (file.type.startsWith('image/')) {
+          reader.readAsDataURL(file);
+        } else {
+          reader.readAsArrayBuffer(file);
+        }
+      });
+    });
+
+    // Add blur event listeners to required fields
+    document.querySelectorAll('[required]').forEach(field => {
+      field.addEventListener('blur', () => {
+        field.classList.add('touched');
+      });
+    });
+
+    // Save button with validation and loading state
+    saveBtn.addEventListener('click', async () => {
+      const form = document.querySelector('.container');
+      const requiredFields = form.querySelectorAll('[required]');
+      let isValid = true;
+
+      // Add form-submitted class to container to show all validation states
+      form.classList.add('form-submitted');
+
+      requiredFields.forEach(field => {
+        if (!field.value.trim()) {
+          isValid = false;
+          field.classList.add('touched');
+          field.reportValidity();
+        }
+      });
+
+      if (!isValid) {
+        showFloatingMessage("Please fill in all required fields", "error");
+        return;
+      }
+
+      try {
+        saveBtn.classList.add('loading');
+        saveBtn.disabled = true;
+        
+        // Simulate API call
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        showFloatingMessage('Form saved successfully!', 'success');
+        setTimeout(() => {
+          window.location.href = 'dashboardPage.html';
+        }, 1000);
+      } catch (error) {
+        showFloatingMessage('Error saving form. Please try again.', 'error');
+        saveBtn.classList.remove('loading');
+        saveBtn.disabled = false;
+      }
     });
 
     // Cancel button redirects to dashboard
     cancelBtn.addEventListener('click', () => {
-      if (confirm('Are you sure you want to cancel? Unsaved data will be lost.')) {
+      const hasChanges = document.getElementById('amountInput').value || 
+                        document.getElementById('notesInput').value ||
+                        document.getElementById('payerCompany').value ||
+                        attachments.length > 0;
+                        
+      if (!hasChanges || confirm('Are you sure you want to cancel? Unsaved data will be lost.')) {
         window.location.href = 'dashboardPage.html';
       }
     });
