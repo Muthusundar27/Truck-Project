@@ -16,6 +16,72 @@
     .logout-btn:hover {
       background-color: #0056b3;
     }
+
+    .popup-btn {
+      border: none;
+      padding: 8px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .confirm-logout-btn {
+      background: #dc3545;
+      color: white;
+      margin-right: 12px;
+    }
+
+    .confirm-logout-btn:hover {
+      background: #c82333;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+    }
+
+    .cancel-btn {
+      background: #6c757d;
+      color: white;
+    }
+
+    .cancel-btn:hover {
+      background: #5a6268;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 8px rgba(108, 117, 125, 0.3);
+    }
+
+    #logoutPopup {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #logoutPopup.visible {
+      opacity: 1;
+    }
+
+    .popup-content {
+      background: white;
+      padding: 32px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+      min-width: 300px;
+      text-align: center;
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+
+    #logoutPopup.visible .popup-content {
+      transform: translateY(0);
+    }
   </style>
 </head>
 
@@ -24,6 +90,16 @@
     <div class="dashboard-header">
       <div id="greeting">Hello!</div>
       <button onclick="logout()" class="logout-btn">Logout</button>
+    </div>
+
+    <!-- Logout Confirmation Popup -->
+    <div id="logoutPopup">
+      <div class="popup-content">
+        <h3 style="margin-bottom:16px; color: #343a40;">Are you sure you want to logout?</h3>
+        <p style="color: #6c757d; margin-bottom: 24px;">You will be redirected to the login page.</p>
+        <button onclick="confirmLogout()" class="popup-btn confirm-logout-btn">Yes, Logout</button>
+        <button onclick="closeLogoutPopup()" class="popup-btn cancel-btn">Cancel</button>
+      </div>
     </div>
 
     <!-- Summary Section -->
@@ -189,8 +265,37 @@
     };
 
     function logout() {
-      localStorage.removeItem('currentUser');
-      window.location.href = 'index.html';
+      const popup = document.getElementById('logoutPopup');
+      popup.style.display = 'flex';
+      // Trigger reflow to ensure transition works
+      void popup.offsetWidth;
+      popup.classList.add('visible');
+    }
+
+    function closeLogoutPopup() {
+      const popup = document.getElementById('logoutPopup');
+      popup.classList.remove('visible');
+      // Wait for transition to complete before hiding
+      setTimeout(() => {
+        popup.style.display = 'none';
+      }, 300);
+    }
+
+    function confirmLogout() {
+      const popup = document.getElementById('logoutPopup');
+      popup.classList.remove('visible');
+      
+      // Show loading state
+      const confirmBtn = document.querySelector('.confirm-logout-btn');
+      const originalText = confirmBtn.textContent;
+      confirmBtn.textContent = 'Logging out...';
+      confirmBtn.style.pointerEvents = 'none';
+      
+      // Simulate a small delay for better UX
+      setTimeout(() => {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'index.html';
+      }, 500);
     }
   </script>
 
